@@ -125,7 +125,17 @@ class PrettyWidget(QWidget):
 				x_to_color_id[x] = len(unique_x)
 				unique_x.add(x_masked)
 
-		colors = ["#{0:0{1}x}".format(random.randint(0,256*256*256-1),6) for i in range(node_n//2//(2**len(self.I)))]
+		colors_n = node_n//2//(2**len(self.I))
+
+		colors = []
+
+		for i in range(colors_n):
+			hsv_color = (i/colors_n,1,1)
+			rgb_color = colorsys.hsv_to_rgb(*hsv_color)
+
+			colors.append("#{0:0{3}x}{1:0{3}x}{2:0{3}x}".format(int(rgb_color[0]*255),int(rgb_color[1]*255),int(rgb_color[2]*255),2))
+
+			# colors = ["#{0:0{3}x}{1:0{3}x}{2:0{3}x}".format(rgb_color[0],rgb_color[1],rgb_color[2],2) for i in range(colors_n)]
 		node_colors = [colors[x_to_color_id[i & ~cleaning_mask]] for i in range(node_n)]
 
 

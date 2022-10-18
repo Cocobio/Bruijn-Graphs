@@ -131,6 +131,8 @@ class PrettyWidget(QWidget):
 		layout.addLayout(layout_h)
 		layout.addWidget(self.arcListWidget)
 
+		self.arcListWidget.itemDoubleClicked.connect(self.deleteArc)
+
 		button = QPushButton("List SCC")
 		button.setObjectName("ListSCC")
 		layout.addWidget(button)
@@ -391,6 +393,20 @@ class PrettyWidget(QWidget):
 		self.updateGView()
 
 		self.w.findChild(QLineEdit, "ILineEdit").setText(str(self.I))
+
+	def deleteArc(self,item):
+		arc = item.text()[1:-1].split(',')
+		print(arc)
+		arc = (int(arc[0],2), int(arc[1],2))
+
+		if arc in self.BasicConstrains:
+			return
+
+		self.AddedConstrains.remove(arc)
+
+		self.init_G()
+		self.fillArcList()
+		self.updateGView()
 
 
 if __name__ == '__main__':

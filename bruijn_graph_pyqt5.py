@@ -18,6 +18,7 @@ class PrettyWidget(QWidget):
 	NumButtons = ['updateGView']
 	n = 5
 	I = [0,1]
+	K = [i for i in range(n) if i not in [0,1]]
 	BasicConstrains = []
 	AddedConstrains = []
 
@@ -86,7 +87,7 @@ class PrettyWidget(QWidget):
 
 		layout.addLayout(layout_h)
 
-		### Lista de nodos a ignorar
+		### Lista de nodos a ignorar y nodos a observar
 		layout_h = QHBoxLayout()
 		label = QLabel()
 		label.setText("Ignore: ")
@@ -97,6 +98,18 @@ class PrettyWidget(QWidget):
 		lineEdit.setText(str(self.I))
 		layout_h.addWidget(lineEdit)
 		lineEdit.returnPressed.connect(self.modifyI)
+
+
+		# layout_h = QHBoxLayout()
+		label = QLabel()
+		label.setText("Observe: ")
+		layout_h.addWidget(label)
+
+		lineEdit = QLineEdit()
+		lineEdit.setObjectName("KLineEdit")
+		lineEdit.setText(str(self.K))
+		layout_h.addWidget(lineEdit)
+		lineEdit.returnPressed.connect(self.modifyK)
 
 		layout.addLayout(layout_h)
 
@@ -139,6 +152,12 @@ class PrettyWidget(QWidget):
 		self.verticalGroupBox.setLayout(layout)
 		button.clicked.connect(self.submitCommand)
 		# self.verticalGroupBox.setLayout(layout)
+
+		button = QPushButton("Run my function")
+		button.setObjectName("runThisScript")
+		layout.addWidget(button)
+		self.verticalGroupBox.setLayout(layout)
+		button.clicked.connect(self.submitCommand)
 
 	def submitCommand(self):
 		eval('self.' + str(self.sender().objectName()) + '()')
@@ -388,11 +407,42 @@ class PrettyWidget(QWidget):
 			print("No list found on line edit.")
 			return
 
+		self.K = [i for i in range(self.n) if i not in self.I]
 		self.init_G()
 		# self.fillArcList()
 		self.updateGView()
 
 		self.w.findChild(QLineEdit, "ILineEdit").setText(str(self.I))
+		self.w.findChild(QLineEdit, "KLineEdit").setText(str(self.K))
+
+	def modifyK(self):
+		data = self.w.findChild(QLineEdit, "KLineEdit").text()
+
+		old_K = [i for i in self.K]
+
+		try:
+			self.K = ast.literal_eval(data)
+			self.K = list(set(self.K+[self.n-1]))
+		except:
+			print("Can't parse text as Python list")
+			return
+
+		if type(self.K) != type(old_K):
+			self.K = old_K
+			print("No list found on line edit.")
+			return
+
+		self.K.sort()
+		while len(self.K)>0 and self.K[-1] >= self.n:
+			self.K.pop()
+
+		self.I = [i for i in range(self.n) if i not in self.K]
+
+		self.init_G()
+		self.updateGView()
+
+		self.w.findChild(QLineEdit, "ILineEdit").setText(str(self.I))
+		self.w.findChild(QLineEdit, "KLineEdit").setText(str(self.K))
 
 	def deleteArc(self,item):
 		arc = item.text()[1:-1].split(',')
@@ -407,6 +457,12 @@ class PrettyWidget(QWidget):
 		self.init_G()
 		self.fillArcList()
 		self.updateGView()
+
+	def runThisScript(self):
+		## The graph is saved in self.G
+		## To force an arc, use the function self.take_arc
+		## Any questions, ask Ignacio :)
+		print("This part is running!")
 
 
 if __name__ == '__main__':

@@ -385,10 +385,14 @@ class PrettyWidget(QWidget):
 			return
 
 		self.init_G()
-		# self.fillArcList()
+		self.fillArcList()
 		self.updateGView()
+		
+		self.K = [i for i in range(self.n) if i not in self.I]
 
 		self.w.findChild(QLineEdit, "ILineEdit").setText(str(self.I))
+		self.w.findChild(QLineEdit, "KLineEdit").setText(str(self.K))
+
 
 	def modifyI(self):
 		data = self.w.findChild(QLineEdit, "ILineEdit").text()
@@ -407,10 +411,10 @@ class PrettyWidget(QWidget):
 			print("No list found on line edit.")
 			return
 
-		self.K = [i for i in range(self.n) if i not in self.I]
 		self.init_G()
 		# self.fillArcList()
 		self.updateGView()
+		self.K = [i for i in range(self.n) if i not in self.I]
 
 		self.w.findChild(QLineEdit, "ILineEdit").setText(str(self.I))
 		self.w.findChild(QLineEdit, "KLineEdit").setText(str(self.K))
